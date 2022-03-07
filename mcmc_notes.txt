@@ -1,0 +1,46 @@
+all possible paramters: pmra, pmdec, vsys, thet, incl, dist0, didt, dtdt, rad0, rotvel, rotdir, sigmavx, sigmavy, sigmavz, phitid, thettid, vtid
+
+** note that the formalism actually uses vtran and thtran for the calculations BUT what we'll actually be fitting is the pmra and pmdec values of the population
+
+model permutations:
+
+"standard" - all parameters sans didt, dtdt, and vsys (first two have no prior constraints and the latter isn't explicitly measured by the Gaia data)
+
+"full_model" - all possible parameters
+
+
+
+Data: RA, Dec
+
+Parameters: Vtran, thtran, vsys, thet, incl, dist0, didt, dtdt, rad0, rotvel, rotdir, sigmavx, sigmavy, sigmavz, phitid, thettid, vtid
+
+
+velcm[:,0], velcm[:,1], velcm[:,2] = make_cm_angvec(vtran, thtran, vsys, trial[:,rho], trial[:,phi])
+
+velpn[:,0], velpn[:,1], velpn[:,2] = pn_comp(thet, incl, dist0, trial[:,phi], trial[:,rho], didt, dtdt)
+
+velint[:,0], velint[:,1], velint[:,2] = make_int_angvec_plane(rad0, rotvel, rotdir, thet, incl, dist0, trial[:,phi], trial[:,rho], trial[:,dist])
+
+calculate a dispersion component
+	*** how did Knut handle this part?
+	*** calculate it the same way as for Claire's work?
+		- we do have to describe the population, though here it's only a single population
+		- but there's no reason we couldn't add in dispersions in the three observable quantities, just not the internal quantities
+			- e.g., mu_ra, mu_dec, vlos and not vx, vy, vz
+
+calculate a tidal component
+	*** 
+
+
+
+
+  trial[:,v1] = velcm[:,0] + velint[:,0] + velkick[:,0] + velpn[:,0]
+  trial[:,v2] = velcm[:,1] + velint[:,1] + velkick[:,1] + velpn[:,1]
+  trial[:,v3] = velcm[:,2] + velint[:,2] + velkick[:,2] + velpn[:,2]
+
+  
+  trial[:,cosg], trial[:,sing] = calc_gamma(center[0], center[1], trial[:,ra], trial[:,dec], trial[:,rho]) 
+
+  trial[:,pmra], trial[:,pmdec] = ang2wcs_vec(dist0, trial[:,v2], trial[:,v3], trial[:,cosg], trial[:,sing], trial[:,rho], trial[:,phi])
+
+  trial[:,pmra] = -1.0 * (trial[:,pmra])
