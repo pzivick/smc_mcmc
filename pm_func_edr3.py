@@ -673,4 +673,35 @@ def plot_prep(ra, dec, mura, mudec, ra0, dec0, mura0, mudec0, dist0, vsys, incl,
 
     return mux, muy, mux_rel, muy_rel
 
-    ################################################################
+################################################################
+
+################################################################
+#### Function to load in priors and prior ranges
+
+def get_priors(perm):
+
+    if perm == 'standard':
+        nparams = 11
+        params = ['pmra0', 'pmdec0', 'thet', 'incl', 'rad0', 'rotvel', 'sigma_pmra', 'sigma_pmdec', \
+                  'phi_tid', 'theta_tid', 'vel_tid']
+        priors = np.asarray([[-5., 5.], [-5., 5.], [0., 360.], [-90., 90.], [-2., 1.], [-50., 50.],
+                            [-2., 0.], [-2., 0.], [0., 360.], [-90., 90.], [-1., 2.]])
+
+    elif perm == 'full':
+        nparams = 15
+        params = ['pmra', 'pmdec', 'thet', 'incl', 'rad0', 'rotvel', 'sigma_pmra', 'sigma_pmdec', \
+                  'phi_tid', 'theta_tid', 'vel_tid', 'ra0', 'dec0', 'dist0', 'vsys']
+        priors = np.asarray([[-5., 5.], [-5., 5.], [0., 360.], [-90., 90.], [-2., 1.], [-50., 50.], \
+                            [-3., 0.], [-3., 0.], [0., 360.], [-90., 90.], [-1., 2.], \
+                            [0., 30.], [-75., -65.],[55., 65.], 120., 170.])
+
+    else:
+        nparams = 11
+        params = ['pmra', 'pmdec', 'thet', 'incl', 'rad0', 'rotvel', 'sigma_pmra', 'sigma_pmdec', \
+                  'phi_tid', 'theta_tid', 'vel_tid']
+        priors = np.asarray([[-5., 5.], [-5., 5.], [0., 360.], [-90., 90.], [-2., 1.], [-50., 50.],
+                            [-3., 0.], [-3., 0.], [0., 360.], [-90., 90.], [-1., 2.]])
+
+    return priors, nparams, params
+
+################################################################
