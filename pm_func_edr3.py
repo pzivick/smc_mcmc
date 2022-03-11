@@ -20,6 +20,8 @@ from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 import scipy
 import astropy.units as u
 import astropy.coordinates as coord
+import emcee
+import time
 
 
 ################################################################
@@ -703,5 +705,16 @@ def get_priors(perm):
                             [-3., 0.], [-3., 0.], [0., 360.], [-90., 90.], [-1., 2.]])
 
     return priors, nparams, params
+
+################################################################
+
+################################################################
+
+def log_prob(theta):
+    t = time.time() + np.random.uniform(0.005, 0.008)
+    while True:
+        if time.time() >= t:
+            break
+    return -0.5*np.sum(theta**2)
 
 ################################################################
