@@ -718,3 +718,40 @@ def log_prob(theta):
     return -0.5*np.sum(theta**2)
 
 ################################################################
+
+################################################################
+#### Function to create a 2D color map based on a 3rd quantity
+
+def create_grid(array, xwidth, xmax, xmin, ywidth, ymax, ymin, xind, yind, zind):
+
+    xn = int((xmax - xmin)/xwidth)
+    yn = int((ymax - ymin)/ywidth)
+
+    xgrid = np.zeros((yn, xn))
+    ygrid = np.zeros((yn, xn))
+    zgrid = np.zeros((yn, xn))
+
+    for i in range(xn):
+        for j in range(yn):
+            xlow = xmin + i*xwidth
+            xhigh = xmin + (i+1)*xwidth
+            ylow = ymin + j*ywidth
+            yhigh = ymin + (j+1)*ywidth
+
+            ind = i*yn + j
+
+            xgrid[j][i] = (xlow+xhigh)/2.0
+            ygrid[j][i] = (ylow+yhigh)/2.0
+
+            subset = array[(array[xind] > xlow) & (array[xind] < xhigh) & \
+                     (array[yind] > ylow) & (array[yind] < yhigh)]
+
+            if (len(subset) == 0):
+                zgrid[j][i] = 0.0
+
+            else:
+                zgrid[j][i] = np.average(subset[zind])
+
+    return xgrid, ygrid, zgrid
+
+################################################################

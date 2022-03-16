@@ -27,12 +27,14 @@ if __name__ == '__main__':
 
     dir = "D:/pzivi/Research/Gurtina_Project/"
 
-    datasource = "allstar_Model2"
+    datasource = "allstar_Model2_oldcore"
     data = Table.read(dir + "Data/"+datasource+".fits")
 
     nwalk = 50
-    nsamp = 5000
+    nsamp = 1500
     ver = "nw" + str(nwalk) + "_ns" + str(nsamp)
+
+    print("adding something new".)
 
     print("Number of stars in " + datasource + " is " + str(len(data)))
 
@@ -116,12 +118,12 @@ if __name__ == '__main__':
     outfilecore = datasource + "_" + perm
 
     headerstr = " ".join(params)
-    np.savetxt('MCMC/' + outfilecore + "_" + ver + "_mcmc_results.txt", samples, header=headerstr, fmt="%1.5f")
+    np.savetxt(dir + 'Output/' + outfilecore + "_" + ver + "_mcmc_results.txt", samples, header=headerstr, fmt="%1.5f")
 
-    np.savetxt('MCMC/' + outfilecore + "_" + ver + "_marginalized_density.txt", chain_test, fmt="%1.5f")
+    np.savetxt(dir + 'Output/' + outfilecore + "_" + ver + "_marginalized_density.txt", chain_test, fmt="%1.5f")
 
     print(
-        "Mean acceptance fraction: {0:.3f}".format(
+        "Mean acceptance frac  tion: {0:.3f}".format(
             np.mean(sampler.acceptance_fraction)
         )
     )
