@@ -755,3 +755,38 @@ def create_grid(array, xwidth, xmax, xmin, ywidth, ymax, ymin, xind, yind, zind)
     return xgrid, ygrid, zgrid
 
 ################################################################
+
+################################################################
+#### Generalized function to transform between xyz frames
+
+def xyz_transform(x, y, z, theta, incl, direction="2sky"):
+
+    position = np.zeros((len(x), 3, 1))
+    position[:,0] = x
+    position[:,1] = y
+    position[:,2] = z
+
+    matrix = np.zeros((3, 3))
+    matrix[0][0] = np.cos(theta)
+    matrix[0][1] = -1.*np.sin(theta)*np.cos(incl)
+    matrix[0][2] = -1.*np.sin(theta)*np.sin(incl)
+    matrix[1][0] = np.sin(theta)
+    matrix[1][1] = np.cos(theta)*np.cos(incl)
+    matrix[1][2] = np.cos(theta)*np.sin(incl)
+    matrix[2][0] = 0.
+    matrix[2][1] = -1.*np.sin(incl)
+    matrix[2][2] = np.cos(incl)
+
+    if (direction=="2sky"):
+        temp = np.dot(matrix, position)
+
+    else:
+        temp = np.dot(np.linalg.inv(matrix), position)
+
+    x2 = np.reshape(temp[0], (len(temp[0]),))
+    y2 = np.reshape(temp[1], (len(temp[1]),))
+    z2 = np.reshape(temp[2], (len(temp[2]),))
+
+    return x2, y2, z2
+
+################################################################
