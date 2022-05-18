@@ -790,3 +790,60 @@ def xyz_transform(x, y, z, theta, incl, direction="2sky"):
     return x2, y2, z2
 
 ################################################################
+#### Function to transform WCS vectors (PM_west, PM_north,
+#### RV) to (vx, vy, vz) coordinates
+
+def wcs2xyz_vec(ra, dec, rho, phi, dist, ra0, dec0, pmw, pmn, v1):
+
+    # First handle the matrix for between WCS and v2/v3
+    cosG, sinG = calc_gamma(ra0, dec0, ra, dec, rho)
+
+    matrix = np.zeros((len(ra), 2, 2))
+    matrix[:,0,0] = -1.*sinG
+    matrix[:,0,1] = -1.*cosG
+    matrix[:,1,0] = cosG
+    matrix[:,1,1] = sinG
+
+    # Next prepare the vectors for pmw/pmn and v2,v3
+
+    pm = np.zeros((len(ra), 2, 1))
+    pm[:,0] = pmw
+    pm[:,1] = pmn
+
+    vec_ang = np.zeros((len(ra), 3, 1))
+    vec_ang[:,0] = v1
+
+
+    temp = np.zeros((len(ra), 2, 1))
+    # Now transform between the frames
+    for i in range(len(matrix)):
+        temp[i] = dist[i] * np.dot(np.linalg.inv(matrix[i]),pm[i])
+
+    vec_ang[:,1] = temp[:,0]
+    vec_ang[:,2] = temp[:,1]
+
+
+    # Now create the next matrix for going from v123 to vxyz
+
+    matrixB = np.zeros((len(ra), 3, 3))
+    matrixB[:,0,0] = np.sin(rho)*np.cos(phi)
+    matrixB[:,0,1] = np.sin(rho)*np.sin(phi)
+    matrixB[:,0,2] = -1.*np.cos(rho)
+    matrixB[:,1,0] = np.cos(rho)*np.cos(phi)
+    matrixB[:,1,1] = np.cos(rho)*np.sin(phi)
+    matrixB[:,1,2] = np.sin(rho)
+    matrixB[:,2,0] = -1.*np.sin(phi)
+    matrixB[:,2,1] = np.cos(phi)
+    matrixB[:,2,2] = 0.
+
+    tempB = np.zeros((len(ra), 3, 1))
+    for i in range(len(matrixB)):
+        tempB[i] = np.dot(np.linalg.inv(matrixB[i]), vec_ang[i])
+
+    vx = np.reshape(tempB[:,0], (len(temp),))
+    vy = np.reshape(tempB[:,1], (len(temp),))
+    vz = np.reshape(tempB[:,2], (len(temp),))
+
+    return vx, vy, vz
+
+################################################################
