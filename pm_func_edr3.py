@@ -405,6 +405,58 @@ def rot3d(x, y, z, matrix):
 #### Function to calculate the rotation matrix for a cartesian
 #### system about the z-axis given an input angle
 
+def rot_xaxis(ang):
+    temp = np.zeros((3,3))
+
+  #first row
+    temp[0][0] = 1.0
+    temp[0][1] = 0.0
+    temp[0][2] = 0.0
+
+  #second row
+    temp[1][0] = 0.0
+    temp[1][1] = np.cos(ang)
+    temp[1][2] = -np.sin(ang)
+
+  #third row
+    temp[2][0] = 0.0
+    temp[2][1] = np.sin(ang)
+    temp[2][2] = np.cos(ang)
+
+    return temp
+
+################################################################
+
+################################################################
+#### Function to calculate the rotation matrix for a cartesian
+#### system about the z-axis given an input angle
+
+def rot_yaxis(ang):
+    temp = np.zeros((3,3))
+
+  #first row
+    temp[0][0] = np.cos(ang)
+    temp[0][1] = 0.0
+    temp[0][2] = np.sin(ang)
+
+  #second row
+    temp[1][0] = 0.0
+    temp[1][1] = 1.0
+    temp[1][2] = 0.0
+
+  #third row
+    temp[2][0] = -np.sin(ang)
+    temp[2][1] = 0.0
+    temp[2][2] = np.cos(ang)
+
+    return temp
+
+################################################################
+
+################################################################
+#### Function to calculate the rotation matrix for a cartesian
+#### system about the z-axis given an input angle
+
 def rot_zaxis(ang):
     temp = np.zeros((3,3))
 
@@ -722,7 +774,8 @@ def log_prob(theta):
 ################################################################
 #### Function to create a 2D color map based on a 3rd quantity
 
-def create_grid(array, xwidth, xmax, xmin, ywidth, ymax, ymin, xind, yind, zind):
+def create_grid(array, xwidth, xmax, xmin, ywidth, ymax, ymin, xind, yind, \
+zind=0, countn=False):
 
     xn = int((xmax - xmin)/xwidth)
     yn = int((ymax - ymin)/ywidth)
@@ -750,7 +803,10 @@ def create_grid(array, xwidth, xmax, xmin, ywidth, ymax, ymin, xind, yind, zind)
                 zgrid[j][i] = 0.0
 
             else:
-                zgrid[j][i] = np.average(subset[zind])
+                if (countn):
+                    zgrid[j][i] = len(subset)
+                else:
+                    zgrid[j][i] = np.average(subset[zind])
 
     return xgrid, ygrid, zgrid
 
@@ -845,5 +901,42 @@ def wcs2xyz_vec(ra, dec, rho, phi, dist, ra0, dec0, pmw, pmn, v1):
     vz = np.reshape(tempB[:,2], (len(temp),))
 
     return vx, vy, vz
+
+################################################################
+
+################################################################
+#### Function to calculate the slit function of a third property
+#### on a 1D axis after averaging over a second axis.
+#### e.g., average of Z as a function of X averaged over an X/Y
+#### window
+
+def slit_function(array, xwidth, xmax, xmin, \
+ymax, ymin, xind, yind, zind=0, countn=False):
+
+    xn = int((xmax - xmin) / xwidth)
+
+    xvals = np.zeros((xn, ))
+    zvals = np.zeros((xn, ))
+
+    for i in range(xn):
+        xlow = xmin + i*xwidth
+        xhigh = xmin + (i+1)*xwidth
+
+        xvals[i] = (xlow+xhigh)/2.0
+
+        subset = array[(array[xind] > xlow) & \
+        (array[xind] < xhigh) & (array[yind] < ymax) & \
+        (array[yind] > ymin)]
+
+        if (len(subset) == 0):
+            zvals[i] = 0.0
+
+        else:
+            if (countn):
+                zvals[i] = len(subset)
+            else:
+                zvals[i] = np.average(subset[zind])
+
+    return xvals, zvals
 
 ################################################################
