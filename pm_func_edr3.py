@@ -911,7 +911,7 @@ def wcs2xyz_vec(ra, dec, rho, phi, dist, ra0, dec0, pmw, pmn, v1):
 #### window
 
 def slit_function(array, xwidth, xmax, xmin, \
-ymax, ymin, xind, yind, zind=0, countn=False):
+ymax, ymin, xind, yind, zind=0, countn=False, func='avg'):
 
     xn = int((xmax - xmin) / xwidth)
 
@@ -935,7 +935,12 @@ ymax, ymin, xind, yind, zind=0, countn=False):
             if (countn):
                 zvals[i] = len(subset)
             else:
-                zvals[i] = np.average(subset[zind])
+                if (func == 'avg'):
+                    zvals[i] = np.average(subset[zind])
+                elif (func == 'std'):
+                    zvals[i] = np.std(subset[zind])
+                else:
+                    zvals[i] = np.average(subset[zind])
 
     return xvals, zvals
 
